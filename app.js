@@ -17,7 +17,7 @@ app.get('/', function(req, res) {
 app.post('/phonebuzz', function(req, res) {
     // First, validate the Twilio request
     if (!twilio.validateExpressRequest(req, '17e35d0f81515bc06b0c36c6e25cccb3')) {
-        //return res.status(403).end('Twilio authentication failed.');
+        return res.status(403).end('Twilio authentication failed.');
     }
 
     // If we're making the request with the Digits parameter,
