@@ -14,10 +14,10 @@ app.get('/', function(req, res) {
 });
 
 // Phase 1
-app.get('/phonebuzz', function(req, res) {
+app.post('/phonebuzz', function(req, res) {
     // First, validate the Twilio request
     if (!twilio.validateExpressRequest(req, '17e35d0f81515bc06b0c36c6e25cccb3')) {
-        return res.status(403).end('Twilio authentication failed.');
+        //return res.status(403).end('Twilio authentication failed.');
     }
 
     // If we're making the request with the Digits parameter,
@@ -46,9 +46,7 @@ app.get('/phonebuzz', function(req, res) {
     // Encoded in TwiML
     var response = new twilio.TwimlResponse();
     response.say('Please enter a number and hit pound')
-            .gather({
-                method: 'GET'
-            });
+            .gather();
 
     res.setHeader('Content-Type', 'text/xml');
     return res.end(response.toString());
