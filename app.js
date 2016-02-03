@@ -14,6 +14,7 @@ app.get('/phonebuzz', function(req, res) {
     // Return a phone voice prompt for user to enter number
     // Encoded in TwiML
     var response = '<?xml version="1.0" encoding="UTF-8"?><Response><Say>Please enter a number</Say></Response>';
+    res.setHeader('Content-Type', 'text/xml');
     res.end(response);
 });
 
