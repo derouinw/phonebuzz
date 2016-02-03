@@ -22,8 +22,8 @@ app.post('/phonebuzz', function(req, res) {
 
     // If we're making the request with the Digits parameter,
     // Twilio has called back with user response
-    if (req.query.Digits) {
-        var number = parseInt(req.query.Digits);
+    if (req.body.Digits) {
+        var number = parseInt(req.body.Digits);
         var fizzBuzz = '';
 
         // FizzBuzz
