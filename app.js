@@ -15,6 +15,8 @@ app.get('/', function(req, res) {
     var page =  '<html>' +
                     '<body><p>Please enter a phone number</p>' +
                         '<form action="phonebuzz2" method="post"><input type="text" name="number"/><br />' +
+                        '<p>Please enter the number of seconds to wait before calling</p>' +
+                        '<input type="text" name="delay" value="0" /><br />' +
                         '<input type="submit" value="Submit" />' +
                         '</form>' +
                     '</body>' +
@@ -61,22 +63,25 @@ app.post('/phonebuzz', function(req, res) {
     return res.end(response.toString());
 });
 
-// Phase 2
+// Phase 2/3
 app.post('/phonebuzz2', function(req, res) {
-    if (!req.body.number) return res.end();
+    if (!req.body.number || !req.body.delay) return res.end();
     var number = req.body.number;
+    var delay = parseInt(req.body.delay);
 
-    var client = twilio('ACf85225f474f01fb37f35b29c5b27d927','17e35d0f81515bc06b0c36c6e25cccb3');
-    client.makeCall({
-        to:number,
-        from:'+14797558788',
-        url:'http://derouinw-phonebuzz.herokuapp.com/phonebuzz'
-    }, function(err, call) {
-        if (err) return res.status(403).end(err.message);
-        else res.end('Call successful');
-    });
+    // Delay the call for the given amount of time
+    setTimeout(function() {
+        var client = twilio('ACf85225f474f01fb37f35b29c5b27d927','17e35d0f81515bc06b0c36c6e25cccb3');
+        client.makeCall({
+            to:number,
+            from:'+14797558788',
+            url:'http://derouinw-phonebuzz.herokuapp.com/phonebuzz'
+        }, function(err, call) {
+            if (err) return res.status(403).end(err.message);
+            else res.end('Call successful');
+        });
+    }, delay * 1000);
 
-    //return res.end('Done');
 });
 
 // Start the server
