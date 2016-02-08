@@ -6,22 +6,48 @@ var querystring = require('querystring');
 var express = require('express');
 var bodyParser = require('body-parser');
 var twilio = require('twilio');
+var client = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 var app = express();
+
+var db_url = 'mongodb://heroku_rpx78t2v:nvl63gsq9rkrep9207rkqvr44g@ds059195.mongolab.com:59195/heroku_rpx78t2v';
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Get homepage
 app.get('/', function(req, res) {
-    var page =  '<html>' +
-                    '<body><p>Please enter a phone number</p>' +
-                        '<form action="phonebuzz2" method="post"><input type="text" name="number"/><br />' +
-                        '<p>Please enter the number of seconds to wait before calling</p>' +
-                        '<input type="text" name="delay" value="0" /><br />' +
-                        '<input type="submit" value="Submit" />' +
-                        '</form>' +
-                    '</body>' +
-                '</html>'
-    return res.end(page);
+
+    client.connect(db_url, function(err, db) {
+        if (err || db == null) return res.status(400).end('Error connecting to database');
+
+        db.collection('phonebuzz-history').find({}).toArray(function(err, records) {
+            if (err) return res.status(400).end('Error connecting to database');
+
+            var history = '<table>' +
+                '<tr><td>Call ID</td><td>Time</td><td>Delay</td><td>Number</td><td>Phone</td><td />';
+
+            for (var i = 0; i < records.length; i++) {
+                var record = records[i];
+                console.log(JSON.stringify(record, 2));
+                history += '<tr><td>'+record['_id']+'</td><td>'+record.time+'</td><td>'+record.delay+'</td><td>'+record.number+'</td><td>'+record.phone+'</td>'
+            }
+
+            history += '</table>';
+
+            var page =  '<html>' +
+                '<body><p>Please enter a phone number</p>' +
+                '<form action="phonebuzz2" method="post"><input type="text" name="number"/><br />' +
+                '<p>Please enter the number of seconds to wait before calling</p>' +
+                '<input type="text" name="delay" value="0" /><br />' +
+                '<input type="submit" value="Submit" />' +
+                '</form>' +
+                history +
+                '</body>' +
+                '</html>';
+
+            return res.end(page);
+        });
+    });
 });
 
 // Phase 1
